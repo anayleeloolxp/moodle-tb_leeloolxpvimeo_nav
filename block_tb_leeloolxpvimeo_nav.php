@@ -361,8 +361,10 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                     $leeloolxpvimeo = $DB->get_record(
                         'leeloolxpvimeo', 
                         array('id' => $module->instance), 
-                        'id, name, display, displayoptions, intro, introformat, vimeo_video_id, vimeo_token'
+                        'id, name, display, displayoptions, intro, introformat, vimeo_video_id, vimeo_token, timemodified'
                     );
+
+                    $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo').date('M-d-Y',$leeloolxpvimeo->timemodified);
 
                     $url = 'https://api.vimeo.com/videos/'.$leeloolxpvimeo->vimeo_video_id;
 
