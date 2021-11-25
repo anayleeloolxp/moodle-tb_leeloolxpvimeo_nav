@@ -64,11 +64,11 @@
         <a href="{{{courseurl}}}" class="tocourse">{{coursename}}</a>
     </div>
     <div class="autoplaydiv">
+        {{autoplaytxt}}
         <label class="switch">
             <input type="checkbox" name="autoplay_vimeo" id="autoplay_vimeo" {{autoplaychecked}}>
             <span class="slider round"></span>
         </label>
-        {{autoplaytxt}}
         <input type="hidden" id="nextvideo" name="nextvideo" value="{{nextvideourl}}" />
     </div>
     {{#sections}}
