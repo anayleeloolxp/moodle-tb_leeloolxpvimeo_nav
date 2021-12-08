@@ -381,6 +381,8 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                     $arroutput = json_decode($output);
                     if( $arroutput->pictures->base_link != '' ){
                         $thismod->videoicon = '<img src="'.$arroutput->pictures->base_link.'"/>';
+                    }else{
+                        $thismod->videoicon = '<img src="'.$CFG->wwwroot.'/mod/leeloolxpvimeo/pix/default_icon.png"/>';
                     }
                     
 

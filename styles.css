@@ -44,8 +44,16 @@
 .block.block_tb_leeloolxpvimeo_nav .pagination > li,
 .block.block_tb_leeloolxpvimeo_nav .allpagination > li {
     display: table-cell;
+    position: relative;
 }
-
+.block_tb_leeloolxpvimeo_nav li.allsectionnames a::before {
+    content: "\f078";
+    position: absolute;
+    font-family: 'FontAwesome';
+    top: 0;
+    right: 0;
+    cursor: pointer;
+}
 .block.block_tb_leeloolxpvimeo_nav .pagination > li a,
 .block.block_tb_leeloolxpvimeo_nav .allpagination > li a {
     background-color: transparent;
