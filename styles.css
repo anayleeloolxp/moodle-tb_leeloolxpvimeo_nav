@@ -83,14 +83,17 @@
 }
 
 .block.block_tb_leeloolxpvimeo_nav ul.activities .completionbox {
-    display: table-cell;
+    display: inline-block;
     position: relative;
-    width: 18px;
+    width: 5%;
 }
 .block.block_tb_leeloolxpvimeo_nav ul.activities .activityicon {
-    display: table-cell;
+    display: inline-block;
     width: 40%;
     padding-right: 5px;
+}
+.block.block_tb_leeloolxpvimeo_nav ul.activities .activityicon img {
+    width: 100%;
 }
 .block.block_tb_leeloolxpvimeo_nav .publishedon {
     color: #888;
@@ -98,10 +101,11 @@
 }
 
 .block.block_tb_leeloolxpvimeo_nav ul.activities .activityname {
-    display: table-cell;
+    display: inline-block;
     vertical-align: middle;
     font-size: 14px;
     line-height: 20px;
+    width: 50%;
 }
 
 .block.block_tb_leeloolxpvimeo_nav ul.activities .completioncheck {
