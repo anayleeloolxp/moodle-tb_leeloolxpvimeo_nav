@@ -88,7 +88,7 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
             return $this->content;
         }
 
-        if($this->page->pagetype != 'mod-leeloolxpvimeo-view'){
+        if ($this->page->pagetype != 'mod-leeloolxpvimeo-view') {
             return $this->content;
         }
 
@@ -330,13 +330,13 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                 $thissection->selected = true;
             }
 
-            
+
 
             $thissection->modules = [];
             if (!empty($modinfo->sections[$i])) {
                 foreach ($modinfo->sections[$i] as $modnumber) {
                     $module = $modinfo->cms[$modnumber];
-                    if( $module->modname != 'leeloolxpvimeo' ){
+                    if ($module->modname != 'leeloolxpvimeo') {
                         continue;
                     }
                     if (!$module->uservisible || !$module->visible || !$module->visibleoncoursepage) {
@@ -359,19 +359,19 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                     );
 
                     $leeloolxpvimeo = $DB->get_record(
-                        'leeloolxpvimeo', 
-                        array('id' => $module->instance), 
+                        'leeloolxpvimeo',
+                        array('id' => $module->instance),
                         'id, name, display, displayoptions, intro, introformat, vimeo_video_id, vimeo_token, timemodified'
                     );
 
-                    $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo').date('M-d-Y',$leeloolxpvimeo->timemodified);
+                    $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo') . date('M-d-Y', $leeloolxpvimeo->timemodified);
 
-                    $url = 'https://api.vimeo.com/videos/'.$leeloolxpvimeo->vimeo_video_id;
+                    $url = 'https://api.vimeo.com/videos/' . $leeloolxpvimeo->vimeo_video_id;
 
                     $postdata = array();
                     $curl = new curl;
                     $headers = array();
-                    $headers[] = 'Authorization: bearer '.$leeloolxpvimeo->vimeo_token;
+                    $headers[] = 'Authorization: bearer ' . $leeloolxpvimeo->vimeo_token;
                     $curloptions = array(
                         'CURLOPT_HTTPHEADER' => $headers,
                         'CURLOPT_RETURNTRANSFER' => true,
@@ -379,12 +379,12 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                     );
                     $output = $curl->post($url, $postdata, $curloptions);
                     $arroutput = json_decode($output);
-                    if( $arroutput->pictures->base_link != '' ){
-                        $thismod->videoicon = '<img src="'.$arroutput->pictures->base_link.'"/>';
-                    }else{
-                        $thismod->videoicon = '<img src="'.$CFG->wwwroot.'/mod/leeloolxpvimeo/pix/default_icon.png"/>';
+                    if ($arroutput->pictures->base_link != '') {
+                        $thismod->videoicon = '<img src="' . $arroutput->pictures->base_link . '"/>';
+                    } else {
+                        $thismod->videoicon = '<img src="' . $CFG->wwwroot . '/mod/leeloolxpvimeo/pix/default_icon.png"/>';
                     }
-                    
+
 
                     $thismod->url = $module->url;
                     if ($module->modname == 'label') {
@@ -473,14 +473,14 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
             'nav'
         );
 
-        $currentkey = array_search($currentvideo,$allvideos);
+        $currentkey = array_search($currentvideo, $allvideos);
         $nextvideourl = '';
-        if( $allvideos[$currentkey+1] ){
-            $nextvideourl = $CFG->wwwroot.'/mod/leeloolxpvimeo/view.php?id='.$allvideos[$currentkey+1];
+        if ($allvideos[$currentkey + 1]) {
+            $nextvideourl = $CFG->wwwroot . '/mod/leeloolxpvimeo/view.php?id=' . $allvideos[$currentkey + 1];
         }
-        
+
         $template->autoplaychecked = '';
-        if( $_COOKIE['autoplay'] == 1){
+        if ($_COOKIE['autoplay'] == 1) {
             $template->autoplaychecked = 'checked';
         }
 

@@ -292,14 +292,14 @@
     height: 22px;
     margin-bottom: 0!important;
 }
-  
+
 /* Hide default HTML checkbox */
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
-  
+
 /* The slider */
 .switch .slider {
     position: absolute;
@@ -312,7 +312,7 @@
     -webkit-transition: .4s;
     transition: .4s;
 }
-  
+
 .switch .slider:before {
     position: absolute;
     content: "";
@@ -324,26 +324,26 @@
     -webkit-transition: .4s;
     transition: .4s;
 }
-  
+
 .switch input:checked + .slider::before {
     background-color: #212529;
 }
-  
+
 .switch input:focus + .slider {
     box-shadow: 0 0 1px #212529;
 }
-  
+
 .switch input:checked + .slider:before {
     -webkit-transform: translateX(20px);
     -ms-transform: translateX(20px);
     transform: translateX(20px);
 }
-  
+
 /* Rounded sliders */
 .switch .slider.round {
     border-radius: 34px;
 }
-  
+
 .switch .slider.round:before {
     border-radius: 50%;
 }
