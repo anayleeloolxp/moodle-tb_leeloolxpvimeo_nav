@@ -330,8 +330,6 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                 $thissection->selected = true;
             }
 
-
-
             $thissection->modules = [];
             if (!empty($modinfo->sections[$i])) {
                 foreach ($modinfo->sections[$i] as $modnumber) {
@@ -364,7 +362,8 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                         'id, name, display, displayoptions, intro, introformat, vimeo_video_id, vimeo_token, timemodified'
                     );
 
-                    $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo') . date('M-d-Y', $leeloolxpvimeo->timemodified);
+                    $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo') .
+                        date('M-d-Y', $leeloolxpvimeo->timemodified);
 
                     $url = 'https://api.vimeo.com/videos/' . $leeloolxpvimeo->vimeo_video_id;
 
@@ -384,7 +383,6 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
                     } else {
                         $thismod->videoicon = '<img src="' . $CFG->wwwroot . '/mod/leeloolxpvimeo/pix/default_icon.png"/>';
                     }
-
 
                     $thismod->url = $module->url;
                     if ($module->modname == 'label') {
