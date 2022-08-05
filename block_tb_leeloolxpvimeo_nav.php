@@ -334,78 +334,152 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
             if (!empty($modinfo->sections[$i])) {
                 foreach ($modinfo->sections[$i] as $modnumber) {
                     $module = $modinfo->cms[$modnumber];
-                    if ($module->modname != 'leeloolxpvimeo') {
+                    if ($module->modname != 'leeloolxpvimeo' && $module->modname != 'quiz') {
                         continue;
                     }
                     if (!$module->uservisible || !$module->visible || !$module->visibleoncoursepage) {
                         continue;
                     }
-                    $thismod = new stdClass();
 
-                    if ($inactivity) {
-                        if ($myactivityid == $module->id) {
-                            $currentvideo = $module->id;
-                            $thissection->selected = true;
-                            $thismod->active = 'active';
+                    if ($module->modname == 'quiz') {
+
+                        $thismod = new stdClass();
+
+                        $questionvimeo = $DB->get_record_sql(
+                            'SELECT qd.vimeoid, qd.questionid, q.name, q.timecreated
+                                FROM {local_leeloolxptrivias_qd} qd
+                                left join {question} q
+                                    on qd.questionid = q.id
+                                left join {quiz_slots} qs
+                                    on qs.questionid = qd.questionid
+                                where qs.quizid = ?',
+                            [$module->instance]
+                        );
+
+                        if ($questionvimeo) {
+                            $thismod->name = format_string(
+                                $questionvimeo->name,
+                                true,
+                                ['context' => $context]
+                            );
+
+                            $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo') .
+                                date('M-d-Y', $questionvimeo->timecreated);
+
+                            $url = 'https://api.vimeo.com/videos/' . $questionvimeo->vimeoid;
+
+                            $settingsjson = get_config('mod_leeloolxpvimeo')->settingsjson;
+                            $resposedatamodvimeo = json_decode(base64_decode($settingsjson));
+
+                            $postdata = array();
+                            $curl = new curl;
+                            $headers = array();
+                            $headers[] = 'Authorization: bearer ' . $resposedatamodvimeo->data->vimeo_videos->vimeo_token;
+                            $curloptions = array(
+                                'CURLOPT_HTTPHEADER' => $headers,
+                                'CURLOPT_RETURNTRANSFER' => true,
+                                'CURLOPT_CUSTOMREQUEST' => 'GET',
+                            );
+                            $output = $curl->post($url, $postdata, $curloptions);
+                            $arroutput = json_decode($output);
+                            if ($arroutput->pictures->base_link != '') {
+                                $thismod->videoicon = '<img src="' . $arroutput->pictures->base_link . '"/>';
+                            } else {
+                                $thismod->videoicon = '<img src="' . $CFG->wwwroot . '/mod/leeloolxpvimeo/pix/default_icon.png"/>';
+                            }
+
+                            $thismod->url = $CFG->wwwroot .
+                                '/mod/leeloolxpvimeo/tv_single.php?id=' .
+                                $questionvimeo->questionid .
+                                '&question=1';
+
+                            $hascompletion = $completioninfo->is_enabled($module);
+                            if ($hascompletion) {
+                                $thismod->completeclass = 'incomplete';
+                            }
+
+                            $completiondata = $completioninfo->get_data(
+                                $module,
+                                true
+                            );
+                            if (in_array(
+                                $completiondata->completionstate,
+                                $completionok
+                            )) {
+                                $thismod->completeclass = 'completed';
+                            }
+                            $thissection->modules[] = $thismod;
+                            $allvideos[] = $module->id;
                         }
-                    }
-
-                    $thismod->name = format_string(
-                        $module->name,
-                        true,
-                        ['context' => $context]
-                    );
-
-                    $leeloolxpvimeo = $DB->get_record(
-                        'leeloolxpvimeo',
-                        array('id' => $module->instance),
-                        'id, name, display, displayoptions, intro, introformat, vimeo_video_id, vimeo_token, timemodified'
-                    );
-
-                    $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo') .
-                        date('M-d-Y', $leeloolxpvimeo->timemodified);
-
-                    $url = 'https://api.vimeo.com/videos/' . $leeloolxpvimeo->vimeo_video_id;
-
-                    $postdata = array();
-                    $curl = new curl;
-                    $headers = array();
-                    $headers[] = 'Authorization: bearer ' . $leeloolxpvimeo->vimeo_token;
-                    $curloptions = array(
-                        'CURLOPT_HTTPHEADER' => $headers,
-                        'CURLOPT_RETURNTRANSFER' => true,
-                        'CURLOPT_CUSTOMREQUEST' => 'GET',
-                    );
-                    $output = $curl->post($url, $postdata, $curloptions);
-                    $arroutput = json_decode($output);
-                    if ($arroutput->pictures->base_link != '') {
-                        $thismod->videoicon = '<img src="' . $arroutput->pictures->base_link . '"/>';
                     } else {
-                        $thismod->videoicon = '<img src="' . $CFG->wwwroot . '/mod/leeloolxpvimeo/pix/default_icon.png"/>';
-                    }
 
-                    $thismod->url = $module->url;
-                    if ($module->modname == 'label') {
-                        $thismod->url = '';
-                        $thismod->label = 'true';
-                    }
-                    $hascompletion = $completioninfo->is_enabled($module);
-                    if ($hascompletion) {
-                        $thismod->completeclass = 'incomplete';
-                    }
+                        $thismod = new stdClass();
 
-                    $completiondata = $completioninfo->get_data(
-                        $module,
-                        true
-                    );
-                    if (in_array(
-                        $completiondata->completionstate,
-                        $completionok
-                    )) {
-                        $thismod->completeclass = 'completed';
+                        if ($inactivity) {
+                            if ($myactivityid == $module->id) {
+                                $currentvideo = $module->id;
+                                $thissection->selected = true;
+                                $thismod->active = 'active';
+                            }
+                        }
+
+                        $thismod->name = format_string(
+                            $module->name,
+                            true,
+                            ['context' => $context]
+                        );
+
+                        $leeloolxpvimeo = $DB->get_record(
+                            'leeloolxpvimeo',
+                            array('id' => $module->instance),
+                            'id, name, display, displayoptions, intro, introformat, vimeo_video_id, vimeo_token, timemodified'
+                        );
+
+                        $thismod->publishedon = get_string('publishedon', 'mod_leeloolxpvimeo') .
+                            date('M-d-Y', $leeloolxpvimeo->timemodified);
+
+                        $url = 'https://api.vimeo.com/videos/' . $leeloolxpvimeo->vimeo_video_id;
+
+                        $postdata = array();
+                        $curl = new curl;
+                        $headers = array();
+                        $headers[] = 'Authorization: bearer ' . $leeloolxpvimeo->vimeo_token;
+                        $curloptions = array(
+                            'CURLOPT_HTTPHEADER' => $headers,
+                            'CURLOPT_RETURNTRANSFER' => true,
+                            'CURLOPT_CUSTOMREQUEST' => 'GET',
+                        );
+                        $output = $curl->post($url, $postdata, $curloptions);
+                        $arroutput = json_decode($output);
+                        if ($arroutput->pictures->base_link != '') {
+                            $thismod->videoicon = '<img src="' . $arroutput->pictures->base_link . '"/>';
+                        } else {
+                            $thismod->videoicon = '<img src="' . $CFG->wwwroot . '/mod/leeloolxpvimeo/pix/default_icon.png"/>';
+                        }
+
+                        $thismod->url = $module->url;
+                        if ($module->modname == 'label') {
+                            $thismod->url = '';
+                            $thismod->label = 'true';
+                        }
+                        $hascompletion = $completioninfo->is_enabled($module);
+                        if ($hascompletion) {
+                            $thismod->completeclass = 'incomplete';
+                        }
+
+                        $completiondata = $completioninfo->get_data(
+                            $module,
+                            true
+                        );
+                        if (in_array(
+                            $completiondata->completionstate,
+                            $completionok
+                        )) {
+                            $thismod->completeclass = 'completed';
+                        }
+                        $thissection->modules[] = $thismod;
+                        $allvideos[] = $module->id;
                     }
-                    $thissection->modules[] = $thismod;
-                    $allvideos[] = $module->id;
                 }
                 $thissection->hasmodules = (count($thissection->modules) > 0);
                 if ($thissection->title != 'General' && $thissection->hasmodules == 1) {
@@ -483,7 +557,7 @@ class block_tb_leeloolxpvimeo_nav extends block_base {
         }
 
         $template->nextvideourl = $nextvideourl;
-        $template->autoplaytxt = get_string('autoplaytxt', 'block_tb_leeloolxpvimeo_nav');;
+        $template->autoplaytxt = get_string('autoplaytxt', 'block_tb_leeloolxpvimeo_nav');
 
         $this->content->text = $renderer->render_nav($template);
         return $this->content;
